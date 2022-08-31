@@ -1,4 +1,7 @@
 let baseTuple;
+let steps = []
+let next
+let prev
 
 function parseTupleIntoObjects(tuple, delimeter) {
     tuple = tuple.substring(1, tuple.length - 1) // REMOVE ANGLE BRACKETS
@@ -12,19 +15,30 @@ function nextTuple(tuple, object, delimeter) {
     return tuple.substring(0, 1) + tuple.substring(1 + charactersToRemove)
 } 
 
-function getSetFromNTuple(tuple, delimeter = ", ") {
+function getSetFromNTuple(tuple, delimeter = ",") {
     const objects = parseTupleIntoObjects(tuple, delimeter); 
 
-    if (objects.length === 1) 
-        return `{${parseTupleIntoObjects(baseTuple, delimeter).slice(-2).join(", ")}}` 
+    if (objects.length === 1) {
+        let An = `{${parseTupleIntoObjects(baseTuple, delimeter).slice(-2).join(", ")}}` 
         // The tuple <an> is {x, y} where x & y are the last 2 elements of the tuple
+        
+        steps.push(`${tuple} = ${An}`)
+        return An
+    }
 
-    const next = nextTuple(tuple, delimeter, objects[0])
+    prev = next || prev
+    next = nextTuple(tuple, delimeter, objects[0])
 
-    return `{{${objects[0]}}, ${getSetFromNTuple(next, delimeter)}}` // recursively solve the next set (remaining tuple elements)
+    steps.push(`${prev} = {{${objects[0]}}, ${next}}`)
+
+    return `{{${objects[0]}}, {${objects[0]}, ${getSetFromNTuple(next, delimeter)}}` // recursively solve the next set (remaining tuple elements)
 }
 
 document.getElementById("submit").addEventListener('click', () => {
+    steps = []
     baseTuple = document.getElementById("tuple").value
-    document.getElementById("result").textContent = getSetFromNTuple(baseTuple)
+    prev = baseTuple
+    next = null
+    document.getElementById("result").textContent = `Result: ${getSetFromNTuple(baseTuple)}\n`
+    document.getElementById("steps").textContent = `Steps:\n` + steps.map(step => step + `\n`).join(" ")
 })
