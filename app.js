@@ -12,7 +12,7 @@ function nextTuple(tuple, object, delimeter) {
     return tuple.substring(0, 1) + tuple.substring(1 + charactersToRemove)
 } 
 
-function getSetFromNTuple(tuple, delimeter = ", ") {
+function getSetFromNTuple(tuple, delimeter = ",") {
     const objects = parseTupleIntoObjects(tuple, delimeter); 
 
     if (objects.length === 1) 
